@@ -1,5 +1,6 @@
 import sys
 import os
+print(os.getcwd())
 
 from core.runtime import run
 
