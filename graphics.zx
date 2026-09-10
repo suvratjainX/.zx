@@ -1,0 +1,23 @@
+import window
+import gui
+
+window.create(
+    title="ZX GUI Test",
+    width=1280,
+    height=720
+)
+
+gui.label(
+    "Welcome to ZX V5",
+    100,
+    100,
+    40
+)
+
+gui.button(
+    "Click Me",
+    100,
+    200
+)
+
+window.run()
