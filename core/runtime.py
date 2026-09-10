@@ -93,6 +93,8 @@ def run(code):
         print("========================")
 
     try:
+        import sys
+        print(sys.path)
         exec(py_code, env)
     except Exception as e:
         print(f"Runtime error: {e}")

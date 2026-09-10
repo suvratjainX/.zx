@@ -36,3 +36,23 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
+hiddenimports=[
+    "stdlib",
+    "stdlib.audio",
+    "stdlib.files",
+    "stdlib.fs",
+    "stdlib.graphics",
+    "stdlib.gui",
+    "stdlib.internet",
+    "stdlib.mathx",
+    "stdlib.network",
+    "stdlib.sound",
+    "stdlib.webapp",
+    "stdlib.window",
+]
+
+datas=[
+    ("stdlib", "stdlib"),
+    ("core", "core"),
+]
