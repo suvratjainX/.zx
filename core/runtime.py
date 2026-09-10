@@ -1,5 +1,4 @@
 from core.parser import translate
-
 from pathlib import Path
 
 DEBUG = False
@@ -12,21 +11,6 @@ try:
 
 except:
     pass
-
-# Built-in ZX modules
-import stdlib.window as window
-import stdlib.graphics as graphics
-import stdlib.audio as audio
-import stdlib.files as files
-import stdlib.internet as internet
-import stdlib.webapp as webapp
-
-# Existing modules
-import stdlib.sound as sound
-import stdlib.gui as gui
-import stdlib.fs as fs
-import stdlib.mathx as mathx
-import stdlib.network as network
 
 
 def zx_input(prompt=""):
@@ -55,12 +39,12 @@ def run(code):
     env = {
         "__builtins__": __builtins__,
 
-        # ZX Builtins
+        # ZX builtins
         "say": print,
         "input": zx_input,
         "end": end,
 
-        # Python Basics
+        # Python basics
         "range": range,
         "len": len,
         "int": int,
@@ -78,28 +62,22 @@ def run(code):
         "min": min,
         "max": max,
         "sum": sum,
-
-        # ZX Modules
-        "window": window,
-        "graphics": graphics,
-        "audio": audio,
-        "files": files,
-        "internet": internet,
-        "webapp": webapp,
-        # Legacy Modules
-        "sound": sound,
-        "gui": gui,
-        "fs": fs,
-        "mathx": mathx,
-        "network": network,
+        "sorted": sorted,
+        "reversed": reversed,
+        "type": type,
+        "isinstance": isinstance,
+        "print": print,
     }
 
     if DEBUG:
         print("=== ZX ENV ===")
         print(sorted(env.keys()))
         print()
+
         print("=== GENERATED PYTHON ===")
         print(py_code)
+        print()
+
         print("========================")
 
     exec(py_code, env)

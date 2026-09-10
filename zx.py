@@ -1,27 +1,59 @@
 import sys
+import os
+
 from core.runtime import run
+
+VERSION = "ZX Language v5"
+
+
+def print_help():
+    print(VERSION)
+    print()
+    print("Usage:")
+    print("  zx file.zx")
+    print()
+    print("Examples:")
+    print("  zx main.zx")
+    print("  zx projects/hello.zx")
+
 
 def main():
 
     if len(sys.argv) < 2:
+        print_help()
+        return 0
 
-        print("ZX Language v5")
-        print()
-        print("Usage:")
-        print("  zx file.zx")
-        return
+    arg = sys.argv[1]
 
-    file = sys.argv[1]
+    if arg in ("--help", "-h"):
+        print_help()
+        return 0
+
+    if arg in ("--version", "-v"):
+        print(VERSION)
+        return 0
+
+    file_path = os.path.abspath(arg)
+
+    if not os.path.isfile(file_path):
+        print(f"File not found: {arg}")
+        return 1
 
     try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            source = f.read()
 
-        with open(file, encoding="utf-8") as f:
+        run(source)
+        return 0
 
-            run(f.read())
+    except KeyboardInterrupt:
+        print("\nExecution cancelled.")
+        return 130
 
-    except FileNotFoundError:
+    except Exception as e:
+        print(f"Runtime error: {e}")
+        return 1
 
-        print(f"File not found: {file}")
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
