@@ -1,16 +1,23 @@
 from core.parser import translate
 from pathlib import Path
+import sys
+import os
 
 DEBUG = False
 
 try:
     config = Path("C:/ZX/debug.txt").read_text()
-
     if "debug_mode=true" in config.lower():
         DEBUG = True
-
 except:
     pass
+
+
+# Make ZX root importable
+ZX_ROOT = Path(__file__).resolve().parent.parent
+
+if str(ZX_ROOT) not in sys.path:
+    sys.path.insert(0, str(ZX_ROOT))
 
 
 def zx_input(prompt=""):
@@ -44,7 +51,7 @@ def run(code):
         "input": zx_input,
         "end": end,
 
-        # Python basics
+        # Python helpers
         "range": range,
         "len": len,
         "int": int,
@@ -55,17 +62,22 @@ def run(code):
         "dict": dict,
         "tuple": tuple,
         "set": set,
+
         "enumerate": enumerate,
         "zip": zip,
+
         "abs": abs,
         "round": round,
         "min": min,
         "max": max,
         "sum": sum,
+
         "sorted": sorted,
         "reversed": reversed,
+
         "type": type,
         "isinstance": isinstance,
+
         "print": print,
     }
 
@@ -80,4 +92,7 @@ def run(code):
 
         print("========================")
 
-    exec(py_code, env)
+    try:
+        exec(py_code, env)
+    except Exception as e:
+        print(f"Runtime error: {e}")
