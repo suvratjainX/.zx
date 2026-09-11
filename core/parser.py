@@ -5,16 +5,15 @@ def translate(code):
     lines = []
 
     for line in code.splitlines():
-
         stripped = line.strip()
 
-        # --------------------------------
+        # =================================
         # import audio
         # import audio as music
-        # --------------------------------
+        # =================================
 
         m = re.match(
-            r"^import\s+(\w+)(?:\s+as\s+(\w+))?$",
+            r'^import\s+(\w+)(?:\s+as\s+(\w+))?$',
             stripped
         )
 
@@ -24,109 +23,149 @@ def translate(code):
             if alias is None:
                 alias = module
 
-            line = (
-                f'{alias} = __import__('
-                f'"stdlib.{module}", '
-                f'fromlist=["*"])'
+            lines.append(
+                f"{alias} = __import__('stdlib.{module}', fromlist=['*'])"
             )
+            continue
 
+        # =================================
+        # python import passthrough
+        # from x import y
+        # import os
+        # =================================
+
+        if stripped.startswith('from '):
             lines.append(line)
             continue
 
-        # --------------------------------
-        # func
-        # --------------------------------
+        if (
+            stripped.startswith('import ')
+            and ' as ' not in stripped
+        ):
+            parts = stripped.split()
 
-        if stripped.startswith("func "):
+            if len(parts) == 2:
+                module = parts[1]
+
+                if module not in (
+                    'audio',
+                    'files',
+                    'fs',
+                    'graphics',
+                    'gui',
+                    'internet',
+                    'mathx',
+                    'network',
+                    'sound',
+                    'webapp',
+                    'window'
+                ):
+                    lines.append(line)
+                    continue
+
+        # =================================
+        # func
+        # =================================
+
+        if stripped.startswith('func '):
             line = line.replace(
-                "func ",
-                "def ",
+                'func ',
+                'def ',
                 1
             )
 
-        # --------------------------------
+        # =================================
         # forever
-        # --------------------------------
+        # =================================
 
-        elif stripped == "forever:":
-
+        elif stripped == 'forever:':
             indent = line[:len(line) - len(line.lstrip())]
+            line = f'{indent}while True:'
 
-            line = f"{indent}while True:"
-
-        # --------------------------------
+        # =================================
         # repeat
-        # --------------------------------
+        # =================================
 
-        elif stripped.startswith("repeat "):
-
+        elif stripped.startswith('repeat ') and stripped.endswith(':'):
             amount = stripped[7:-1]
 
             indent = line[:len(line) - len(line.lstrip())]
 
             line = (
-                f"{indent}"
-                f"for _ in range({amount}):"
+                f'{indent}'
+                f'for _ in range({amount}):'
             )
 
-        # --------------------------------
+        # =================================
         # end
-        # --------------------------------
+        # =================================
 
-        elif stripped == "end":
-
+        elif stripped == 'end':
             indent = line[:len(line) - len(line.lstrip())]
+            line = indent + 'end()'
 
-            line = indent + "end()"
-
-        # --------------------------------
+        # =================================
         # contains any
-        # --------------------------------
+        # =================================
 
         m = re.match(
-            r"^(\s*)(if|elif)\s+(.+?)\s+contains\s+any\s+(.+):$",
+            r'^(\s*)(if|elif)\s+(.+?)\s+contains\s+any\s+(.+):$',
             line
         )
 
         if m:
-
             indent, keyword, left, right = m.groups()
 
             line = (
-                f"{indent}{keyword} "
-                f"any(word in {left} "
-                f"for word in {right}):"
+                f'{indent}{keyword} '
+                f'any(word in {left} for word in {right}):'
             )
 
         else:
 
-            # ----------------------------
-            # contains
-            # ----------------------------
+            # =================================
+            # contains with AND support
+            # query contains "play" and "gospel"
+            # =>
+            # "play" in query and "gospel" in query
+            # =================================
 
             m = re.match(
-                r"^(\s*)(if|elif)\s+(.+?)\s+contains\s+(.+):$",
+                r'^(\s*)(if|elif)\s+(.+?)\s+contains\s+(.+):$',
                 line
             )
 
             if m:
-
                 indent, keyword, left, right = m.groups()
 
-                line = (
-                    f"{indent}{keyword} "
-                    f"{right} in {left}:"
+                parts = [
+                    p.strip()
+                    for p in re.split(
+                        r'\s+and\s+',
+                        right
+                    )
+                ]
+
+                condition = ' and '.join(
+                    f'{part} in {left}'
+                    for part in parts
                 )
 
-        # --------------------------------
+                line = (
+                    f'{indent}'
+                    f'{keyword} '
+                    f'{condition}:'
+                )
+
+        # =================================
         # say()
-        # --------------------------------
+        # =================================
 
         line = line.replace(
-            "say(",
-            "print("
+            'say(',
+            'print('
         )
 
         lines.append(line)
 
-    return "\n".join(lines)
+    return '\n'.join(lines)

@@ -139,6 +139,7 @@ def run(code):
         print("\n========================\n")
 
     try:
+        print(py_code)
         exec(py_code, env)
 
     except SystemExit:
