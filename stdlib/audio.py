@@ -1,4 +1,3 @@
-print("audio.py loading...")
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -30,7 +29,6 @@ _current_music = None
 _music_queue = []
 _loop = False
 _paused = False
-print("_paused created")
 _music_volume = 1.0
 _sound_volume = 1.0
 _sound_cache = {}
