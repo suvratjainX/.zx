@@ -56,20 +56,20 @@ def stop():
     _paused = False
 
 
+_paused = False
+
 def pause():
     global _paused
 
-    if pygame.mixer.music.get_busy():
-        pygame.mixer.music.pause()
-        _paused = True
+    pygame.mixer.music.pause()
+    _paused = True
 
 
 def resume():
     global _paused
 
-    if _paused:
-        pygame.mixer.music.unpause()
-        _paused = False
+    pygame.mixer.music.unpause()
+    _paused = False
 
 
 def restart():
