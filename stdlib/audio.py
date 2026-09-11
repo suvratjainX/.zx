@@ -1,3 +1,4 @@
+print("audio.py loading...")
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -6,6 +7,15 @@ import threading
 import time
 import random
 from threading import Lock
+from pathlib import Path
+
+DEBUG = False
+
+try:
+    config = Path("C:/ZX/audio_debug.txt").read_text().lower()
+    DEBUG = "debug=true" in config
+except:
+    pass
 
 # ==================================================
 # INIT
@@ -14,17 +24,15 @@ from threading import Lock
 pygame.mixer.init()
 pygame.mixer.set_num_channels(64)
 
-_current_music = None
 _music_state = "stopped"  # playing paused stopped
-
-_music_queue = []
 _queue_lock = Lock()
-
+_current_music = None
+_music_queue = []
 _loop = False
-
+_paused = False
+print("_paused created")
 _music_volume = 1.0
 _sound_volume = 1.0
-
 _sound_cache = {}
 
 # ==================================================
@@ -42,15 +50,32 @@ def music(file, loops=0):
     global _current_music
     global _music_state
 
+    if DEBUG:
+        print("=== MUSIC ===")
+        print("File:", file)
+        print("Loops:", loops)
+
     if not os.path.exists(file):
         raise FileNotFoundError(file)
 
     pygame.mixer.music.load(file)
+
+    if DEBUG:
+        print("Loaded")
+
     pygame.mixer.music.set_volume(_music_volume)
+
     pygame.mixer.music.play(loops=loops)
+
+    if DEBUG:
+        print("Busy after play:", pygame.mixer.music.get_busy())
 
     _current_music = file
     _music_state = "playing"
+
+    if DEBUG:
+        print("State:", _music_state)
+        print("================")
 
     return True
 
@@ -69,17 +94,34 @@ def stop():
 def pause():
     global _music_state
 
-    if _music_state == "playing":
-        pygame.mixer.music.pause()
-        _music_state = "paused"
+    if DEBUG:
+        print("=== PAUSE ===")
+        print("Busy:", pygame.mixer.music.get_busy())
+        print("State before:", _music_state)
+
+    pygame.mixer.music.pause()
+    _music_state = "paused"
+
+    if DEBUG:
+        print("State after:", _music_state)
+        print("================")
 
 
 def resume():
     global _music_state
 
-    if _music_state == "paused":
-        pygame.mixer.music.unpause()
-        _music_state = "playing"
+    if DEBUG:
+        print("=== RESUME ===")
+        print("Busy before:", pygame.mixer.music.get_busy())
+        print("State before:", _music_state)
+
+    pygame.mixer.music.unpause()
+    _music_state = "playing"
+
+    if DEBUG:
+        print("Busy after:", pygame.mixer.music.get_busy())
+        print("State after:", _music_state)
+        print("================")
 
 
 def toggle_pause():
