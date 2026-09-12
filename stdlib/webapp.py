@@ -262,3 +262,52 @@ def height():
 
     if _main_window:
         return _main_window.height
+
+# ==========================================
+# BROWSER SUPPORT
+# ==========================================
+
+def browser(
+    url='https://google.com',
+    title='ZX Browser',
+    width=1400,
+    height=900,
+    resizable=True
+):
+    global _main_window
+
+    window = webview.create_window(
+        title=title,
+        url=url,
+        width=width,
+        height=height,
+        resizable=resizable
+    )
+
+    if _main_window is None:
+        _main_window = window
+
+    _windows.append(window)
+
+    webview.start()
+
+    return window
+
+
+def open_website(url):
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+
+    if _main_window:
+        _main_window.load_url(url)
+
+
+def navigate(url):
+    open_website(url)
+
+
+def current_url():
+    try:
+        return _main_window.get_current_url()
+    except:
+        return None
